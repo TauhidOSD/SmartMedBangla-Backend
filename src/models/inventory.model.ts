@@ -17,7 +17,7 @@ export const InventoryModel = {
   findExpiringUnalerted: (until: Date) =>
     prisma.inventoryItem.findMany({
       where: { isDisposed: false, expiryAlertSentAt: null, expiryDate: { lte: until } },
-      include: { patient: { select: { id: true, name: true, email: true, honorific: true, status: true, language: true } } },
+      include: { patient: { select: { id: true, name: true, email: true, honorific: true, status: true, language: true, phone: true, smsEnabled: true } } },
       take: 1000,
     }),
 

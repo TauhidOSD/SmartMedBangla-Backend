@@ -50,6 +50,15 @@ const envSchema = z.object({
   VAPID_PRIVATE_KEY: optional,
   VAPID_SUBJECT: z.string().default("mailto:support@smartmed.app"),
 
+  // Offline alerts. "log" just prints – handy in development.
+  SMS_PROVIDER: z.enum(["log", "bulksmsbd", "twilio"]).default("log"),
+  VOICE_PROVIDER: z.enum(["log", "twilio"]).default("log"),
+  BULKSMSBD_API_KEY: optional,
+  BULKSMSBD_SENDER_ID: optional,
+  TWILIO_ACCOUNT_SID: optional,
+  TWILIO_AUTH_TOKEN: optional,
+  TWILIO_FROM_NUMBER: optional,
+
   SSLC_STORE_ID: optional,
   SSLC_STORE_PASSWORD: optional,
   SSLC_IS_LIVE: bool(false),
@@ -80,5 +89,9 @@ export const features = {
   redis: Boolean(env.REDIS_URL),
   smtp: Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS),
   webPush: Boolean(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY),
+  sms:
+    (env.SMS_PROVIDER === "bulksmsbd" && Boolean(env.BULKSMSBD_API_KEY && env.BULKSMSBD_SENDER_ID)) ||
+    (env.SMS_PROVIDER === "twilio" && Boolean(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_FROM_NUMBER)),
+  voice: env.VOICE_PROVIDER === "twilio" && Boolean(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_FROM_NUMBER),
   sslcommerz: Boolean(env.SSLC_STORE_ID && env.SSLC_STORE_PASSWORD),
 };

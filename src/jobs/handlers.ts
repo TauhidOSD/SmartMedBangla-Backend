@@ -12,6 +12,7 @@ import { SessionModel } from "../models/session.model.js";
 import { UserModel } from "../models/user.model.js";
 import { materializeDay } from "../services/dose.service.js";
 import { sendEmail } from "../services/email.service.js";
+import { placeVoiceCall, sendSms } from "../services/sms.service.js";
 import { EXPIRY_WARNING_DAYS } from "../services/inventory.service.js";
 import { notify } from "../services/notification.service.js";
 import { logger } from "../utils/logger.js";
@@ -32,32 +33,37 @@ export async function dispatchDueReminders() {
   const now = new Date();
   const due = await DoseLogModel.findDueUnnotified(now, addMinutes(now, -env.MISSED_DOSE_GRACE_MINUTES));
   const active = due.filter((d) => d.patient.status === "ACTIVE");
+  // Claim these doses first so a slow SMS/call can never cause a duplicate on the next tick.
+  if (due.length) await DoseLogModel.markNotified(due.map((d) => d.id));
 
   for (const dose of active) {
     const lang = dose.patient.language;
-    const speakText = dose.patient.voiceEnabled
-      ? buildDoseSpeech({
-          language: lang,
-          honorific: dose.patient.honorific,
-          patientName: dose.patient.name,
-          medicineName: dose.medicine.name,
-          quantity: dose.reminder.quantity,
-          mealTiming: dose.medicine.mealTiming,
-        })
-      : null;
+    const spoken = buildDoseSpeech({
+      language: lang,
+      honorific: dose.patient.honorific,
+      patientName: dose.patient.name,
+      medicineName: dose.medicine.name,
+      quantity: dose.reminder.quantity,
+      mealTiming: dose.medicine.mealTiming,
+    });
+    const title = lang === "bn" ? `💊 ${dose.medicine.name} খাওয়ার সময়` : `💊 Time for ${dose.medicine.name}`;
+    const message =
+      lang === "bn"
+        ? `${dose.reminder.time} — ${dose.reminder.quantity}টি, ${mealTimingLabel(dose.medicine.mealTiming, lang)}`
+        : `${dose.reminder.time} — take ${dose.reminder.quantity}, ${mealTimingLabel(dose.medicine.mealTiming, lang)}`;
     await notify(dose.patientId, {
       type: "DOSE_REMINDER",
-      title: lang === "bn" ? `💊 ${dose.medicine.name} খাওয়ার সময়` : `💊 Time for ${dose.medicine.name}`,
-      message:
-        lang === "bn"
-          ? `${dose.reminder.time} — ${dose.reminder.quantity}টি, ${mealTimingLabel(dose.medicine.mealTiming, lang)}`
-          : `${dose.reminder.time} — take ${dose.reminder.quantity}, ${mealTimingLabel(dose.medicine.mealTiming, lang)}`,
-      speakText,
+      title,
+      message,
+      speakText: dose.patient.voiceEnabled ? spoken : null,
       data: { doseId: dose.id, medicineId: dose.medicineId },
       url: "/dashboard",
     });
+
+    // Offline alerts – reach patients without internet or a smartphone.
+    if (dose.patient.smsEnabled) await sendSms(dose.patient.phone, `SmartMed: ${dose.medicine.name} — ${message}`);
+    if (dose.patient.callEnabled) await placeVoiceCall(dose.patient.phone, spoken, lang);
   }
-  if (due.length) await DoseLogModel.markNotified(due.map((d) => d.id));
   return { notified: active.length };
 }
 
@@ -100,6 +106,12 @@ export async function processMissedDoses() {
         url: `/dashboard/care/${patientId}`,
       });
       await sendEmail(caregiver.email, emailTemplates.missedDoses(caregiver.name, patientName, list));
+      if (caregiver.smsEnabled) {
+        await sendSms(
+          caregiver.phone,
+          caregiver.language === "en" ? `SmartMed: ${patientName} missed ${names}. Please call them.` : `স্মার্টমেড: ${patientName} ওষুধ খাননি — ${names}। একবার ফোন করুন।`,
+        );
+      }
     }
   }
   return { missed: overdue.length };
@@ -136,6 +148,10 @@ export async function processExpiryAlerts() {
       url: "/dashboard/cabinet",
     });
     await sendEmail(patient.email, emailTemplates.expiryAlert(patient.name, rows));
+    if (patient.smsEnabled) {
+      const names = rows.map((r) => `${r.name} (${r.expiry})`).join(", ");
+      await sendSms(patient.phone, patient.language === "en" ? `SmartMed: expiring medicine — ${names}. Do not take it.` : `স্মার্টমেড: মেয়াদ শেষ হচ্ছে — ${names}। এই ওষুধ খাবেন না।`);
+    }
 
     const caregivers = await CareLinkModel.listCaregiversOf(patientId);
     for (const { caregiver } of caregivers) {

@@ -34,7 +34,9 @@ export const DoseLogModel = {
       where: { status: "PENDING", notifiedAt: null, scheduledFor: { lte: now, gte: notOlderThan } },
       include: {
         ...doseInclude,
-        patient: { select: { id: true, name: true, honorific: true, voiceEnabled: true, language: true, status: true } },
+        patient: {
+          select: { id: true, name: true, honorific: true, voiceEnabled: true, language: true, status: true, phone: true, smsEnabled: true, callEnabled: true },
+        },
       },
       take: 500,
     }),

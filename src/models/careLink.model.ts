@@ -49,6 +49,6 @@ export const CareLinkModel = {
   listCaregiversOf: (patientId: string) =>
     prisma.careLink.findMany({
       where: { patientId, status: "ACCEPTED", caregiverId: { not: null } },
-      select: { relation: true, caregiver: { select: { id: true, name: true, email: true } } },
+      select: { relation: true, caregiver: { select: { id: true, name: true, email: true, phone: true, smsEnabled: true, language: true } } },
     }),
 };
