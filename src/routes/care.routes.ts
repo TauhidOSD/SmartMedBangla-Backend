@@ -5,6 +5,7 @@ import { authenticate, authorize, requireVerifiedEmail } from "../middlewares/au
 import { validate } from "../middlewares/validate.middleware.js";
 import { careValidator } from "../validators/care.validator.js";
 import { idParam } from "../validators/common.validator.js";
+import { userValidator } from "../validators/user.validator.js";
 
 const router = Router();
 
@@ -30,6 +31,13 @@ router.get(
   authorize("CAREGIVER", "ADMIN"),
   validate({ params: z.object({ patientId: z.string().min(1) }) }),
   careController.patientOverview,
+);
+
+router.patch(
+  "/patients/:patientId/alerts",
+  authorize("CAREGIVER"),
+  validate({ params: z.object({ patientId: z.string().min(1) }), body: userValidator.alerts }),
+  careController.updatePatientAlerts,
 );
 
 export default router;

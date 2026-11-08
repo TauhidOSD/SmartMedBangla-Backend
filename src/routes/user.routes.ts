@@ -17,6 +17,7 @@ router.post("/me/avatar", imageUpload.single("image"), userController.uploadAvat
 router.post("/me/share-link", validate({ body: userValidator.shareLink }), userController.createShareLink);
 router.delete("/me/share-link", userController.revokeShareLink);
 router.delete("/me", validate({ body: userValidator.deleteAccount }), userController.deleteAccount);
+router.post("/me/test-alert", userController.testAlert);
 
 router.get("/dashboard", patientScope, userController.dashboard);
 

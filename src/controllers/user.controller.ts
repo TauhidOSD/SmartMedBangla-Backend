@@ -36,6 +36,14 @@ export const userController = {
     sendResponse(res, { data: await userService.sharedProfile(req.params.token as string) });
   },
 
+  async testAlert(req: Request, res: Response) {
+    const result = await userService.testAlert(req.user!.id);
+    sendResponse(res, {
+      message: result.smsConfigured ? "Test alert sent" : "SMS provider is not configured – the message was only logged on the server",
+      data: result,
+    });
+  },
+
   async dashboard(req: Request, res: Response) {
     sendResponse(res, { data: await userService.dashboard(req.patientId!) });
   },

@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-import { env } from "../config/env.js";
 import { prisma } from "../config/prisma.js";
 import type { Prisma } from "../generated/prisma/client.js";
 import { AuditLogModel } from "../models/auditLog.model.js";
@@ -13,6 +12,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { randomToken } from "../utils/crypto.js";
 import { addDays } from "../utils/time.js";
 import { doseService } from "./dose.service.js";
+import { env, features } from "../config/env.js";
+import { normalizeBdPhone, placeVoiceCall, sendSms } from "./sms.service.js";
 import { deleteImage, uploadImage } from "./upload.service.js";
 
 export const userService = {
@@ -22,7 +23,14 @@ export const userService = {
     return user;
   },
 
-  updateProfile: (userId: string, data: Prisma.UserUpdateInput) => UserModel.update(userId, data),
+  /** A doctor / pharmacy that changes its licence number loses the verified badge until an admin re-checks it. */
+  async updateProfile(userId: string, data: Prisma.UserUpdateInput) {
+    if (typeof data.licenseNumber === "string" || data.licenseNumber === null) {
+      const current = await UserModel.findById(userId);
+      if (current?.isProVerified && current.licenseNumber !== data.licenseNumber) data = { ...data, isProVerified: false };
+    }
+    return UserModel.update(userId, data);
+  },
 
   updatePreferences: (userId: string, data: Prisma.UserUpdateInput) => UserModel.update(userId, data),
 
@@ -41,6 +49,19 @@ export const userService = {
       shareExpiresAt: expiresInDays ? addDays(new Date(), expiresInDays) : null,
     });
     return { token: user.shareToken, expiresAt: user.shareExpiresAt, url: `${env.CLIENT_URL}/share/${user.shareToken}` };
+  },
+
+  /** Sends a test SMS (and call, if enabled) so the user can confirm offline alerts reach their phone. */
+  async testAlert(userId: string) {
+    const user = await UserModel.findById(userId);
+    if (!user) throw ApiError.notFound("User not found");
+    if (!normalizeBdPhone(user.phone)) throw ApiError.badRequest("Add a valid mobile number first");
+    const bn = user.language === "bn";
+    const sms = await sendSms(user.phone, bn ? "স্মার্টমেড: এটি একটি পরীক্ষামূলক বার্তা। আপনার ফোনে রিমাইন্ডার আসবে।" : "SmartMed: this is a test message. Your reminders will arrive on this phone.");
+    const call = user.callEnabled
+      ? await placeVoiceCall(user.phone, bn ? "আসসালামু আলাইকুম। এটি স্মার্টমেডের পরীক্ষামূলক কল।" : "Hello. This is a test call from SmartMed.", user.language)
+      : false;
+    return { sms, call, smsConfigured: features.sms, voiceConfigured: features.voice };
   },
 
   revokeShareLink: (userId: string) => UserModel.update(userId, { shareToken: null, shareExpiresAt: null }),

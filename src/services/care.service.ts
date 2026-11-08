@@ -100,6 +100,15 @@ export const careService = {
     );
   },
 
+  /** Lets an accepted caregiver set the patient's mobile number and SMS / call alerts. */
+  async updatePatientAlerts(caregiver: AuthUser, patientId: string, input: { phone?: string | null; smsEnabled?: boolean; callEnabled?: boolean }) {
+    if (!(await CareLinkModel.isActiveCaregiver(patientId, caregiver.id))) {
+      throw ApiError.forbidden("You are not a caregiver for this patient");
+    }
+    const patient = await UserModel.update(patientId, input);
+    return { phone: patient.phone, smsEnabled: patient.smsEnabled, callEnabled: patient.callEnabled };
+  },
+
   async patientOverview(caregiver: AuthUser, patientId: string) {
     if (caregiver.role === "CAREGIVER" && !(await CareLinkModel.isActiveCaregiver(patientId, caregiver.id))) {
       throw ApiError.forbidden("You are not a caregiver for this patient");
@@ -124,6 +133,8 @@ export const careService = {
         allergies: patient.allergies,
         chronicConditions: patient.chronicConditions,
         emergencyContact: patient.emergencyContact,
+        smsEnabled: patient.smsEnabled,
+        callEnabled: patient.callEnabled,
       },
       today,
       weekly: stats,

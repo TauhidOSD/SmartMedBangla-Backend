@@ -172,6 +172,33 @@ const EXACT: Record<string, string> = {
   "You cannot delete your own account": "নিজের অ্যাকাউন্ট মোছা যায় না",
   "Nothing to update": "পরিবর্তনের কিছু নেই",
 
+  // Doctor / pharmacy prescriptions
+  "Prescription created": "প্রেসক্রিপশন তৈরি হয়েছে",
+  "Prescription code not found": "প্রেসক্রিপশন কোড পাওয়া যায়নি",
+  "This prescription has already been added to another account": "এই প্রেসক্রিপশন আগেই অন্য অ্যাকাউন্টে যোগ হয়েছে",
+  "This prescription code has expired": "এই প্রেসক্রিপশন কোডের মেয়াদ শেষ",
+  "Only patient accounts can add a prescription": "শুধু রোগীর অ্যাকাউন্টে প্রেসক্রিপশন যোগ করা যায়",
+  "This prescription is already in your account": "এই প্রেসক্রিপশন আগেই আপনার অ্যাকাউন্টে আছে",
+  "Prescription added to your account": "প্রেসক্রিপশন আপনার অ্যাকাউন্টে যোগ হয়েছে",
+  "A prescription that a patient has already added cannot be deleted": "রোগী যোগ করে ফেলেছেন এমন প্রেসক্রিপশন মোছা যায় না",
+  "This prescription has already been added to a patient's account": "এই প্রেসক্রিপশন আগেই রোগীর অ্যাকাউন্টে যোগ হয়েছে",
+  "Added to the patient's SmartMed account": "রোগীর স্মার্টমেড অ্যাকাউন্টে যোগ হয়েছে",
+  "Prescription link sent by email": "প্রেসক্রিপশনের লিংক ইমেইলে পাঠানো হয়েছে",
+  "This prescription has no photo to read": "এই প্রেসক্রিপশনে পড়ার মতো কোনো ছবি নেই",
+  "Add at least one medicine": "অন্তত একটি ওষুধ যোগ করুন",
+  "Patient name is required": "রোগীর নাম দিন",
+  "Invalid prescription code": "প্রেসক্রিপশন কোডটি সঠিক নয়",
+  "Hospital or chamber name is required": "হাসপাতাল বা চেম্বারের নাম দিন",
+  "Pharmacy name is required": "ফার্মেসির নাম দিন",
+  "BMDC registration number is required": "BMDC রেজিস্ট্রেশন নম্বর দিন",
+  "Drug licence number is required": "ড্রাগ লাইসেন্স নম্বর দিন",
+
+  // SMS / voice alerts
+  "Test alert sent": "পরীক্ষামূলক বার্তা পাঠানো হয়েছে",
+  "SMS provider is not configured – the message was only logged on the server": "SMS সার্ভিস এখনো চালু হয়নি — বার্তাটি শুধু সার্ভারে লগ হয়েছে",
+  "Add a valid mobile number first": "আগে একটি সঠিক মোবাইল নম্বর দিন",
+  "Alert settings saved": "সতর্কবার্তার সেটিং সংরক্ষণ হয়েছে",
+
   // Common validation messages
   "Enter a valid email address": "সঠিক ইমেইল দিন",
   "Password must be at least 8 characters": "পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে",

@@ -30,6 +30,11 @@ export const careController = {
     sendResponse(res, { data: await careService.patients(req.user!) });
   },
 
+  async updatePatientAlerts(req: Request, res: Response) {
+    const data = await careService.updatePatientAlerts(req.user!, req.params.patientId as string, req.body);
+    sendResponse(res, { message: "Alert settings saved", data });
+  },
+
   async patientOverview(req: Request, res: Response) {
     sendResponse(res, { data: await careService.patientOverview(req.user!, req.params.patientId as string) });
   },
