@@ -53,7 +53,19 @@ async function consumeOtp(userId: string, purpose: OtpPurpose, code: string) {
 }
 
 export const authService = {
-  async register(input: { name: string; email: string; phone?: string; password: string; role: "PATIENT" | "CAREGIVER" }, meta: ClientMeta) {
+  async register(
+    input: {
+      name: string;
+      email: string;
+      phone?: string;
+      password: string;
+      role: "PATIENT" | "CAREGIVER" | "DOCTOR" | "PHARMACY";
+      organization?: string;
+      licenseNumber?: string;
+      specialty?: string;
+    },
+    meta: ClientMeta,
+  ) {
     if (await UserModel.findByEmail(input.email)) throw ApiError.conflict("An account with this email already exists");
 
     const user = await UserModel.create({
@@ -61,6 +73,9 @@ export const authService = {
       email: input.email,
       phone: input.phone,
       role: input.role,
+      organization: input.organization,
+      licenseNumber: input.licenseNumber,
+      specialty: input.specialty,
       passwordHash: await bcrypt.hash(input.password, 12),
     });
     await sendOtp(user, "EMAIL_VERIFY");

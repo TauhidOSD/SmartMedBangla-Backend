@@ -5,12 +5,13 @@ export const adminValidator = {
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(100).optional(),
     search: z.string().trim().max(100).optional(),
-    role: z.enum(["PATIENT", "CAREGIVER", "ADMIN"]).optional(),
+    role: z.enum(["PATIENT", "CAREGIVER", "ADMIN", "DOCTOR", "PHARMACY"]).optional(),
     status: z.enum(["ACTIVE", "SUSPENDED"]).optional(),
   }),
   updateUser: z
     .object({
-      role: z.enum(["PATIENT", "CAREGIVER", "ADMIN"]).optional(),
+      role: z.enum(["PATIENT", "CAREGIVER", "ADMIN", "DOCTOR", "PHARMACY"]).optional(),
+      isProVerified: z.boolean().optional(),
       status: z.enum(["ACTIVE", "SUSPENDED"]).optional(),
       plan: z.enum(["FREE", "PREMIUM"]).optional(),
       planExpiresAt: z.coerce.date().nullish(),
@@ -26,6 +27,6 @@ export const adminValidator = {
   broadcast: z.object({
     title: z.string().trim().min(3).max(120),
     message: z.string().trim().min(3).max(500),
-    role: z.enum(["PATIENT", "CAREGIVER", "ADMIN"]).optional(),
+    role: z.enum(["PATIENT", "CAREGIVER", "ADMIN", "DOCTOR", "PHARMACY"]).optional(),
   }),
 };

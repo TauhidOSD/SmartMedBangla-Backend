@@ -22,7 +22,19 @@ export const authValidator = {
       .optional()
       .or(z.literal("").transform(() => undefined)),
     password,
-    role: z.enum(["PATIENT", "CAREGIVER"]).default("PATIENT"),
+    role: z.enum(["PATIENT", "CAREGIVER", "DOCTOR", "PHARMACY"]).default("PATIENT"),
+    organization: z.string().trim().max(160).optional(),
+    licenseNumber: z.string().trim().max(60).optional(),
+    specialty: z.string().trim().max(80).optional(),
+  }).superRefine((v, ctx) => {
+    if (v.role === "DOCTOR" || v.role === "PHARMACY") {
+      if (!v.organization || v.organization.length < 2) {
+        ctx.addIssue({ code: "custom", path: ["organization"], message: v.role === "DOCTOR" ? "Hospital or chamber name is required" : "Pharmacy name is required" });
+      }
+      if (!v.licenseNumber || v.licenseNumber.length < 3) {
+        ctx.addIssue({ code: "custom", path: ["licenseNumber"], message: v.role === "DOCTOR" ? "BMDC registration number is required" : "Drug licence number is required" });
+      }
+    }
   }),
   login: z.object({ email, password: z.string().min(1, "Password is required") }),
   verifyEmail: z.object({ email, code: otp }),

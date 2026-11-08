@@ -7,6 +7,7 @@ import { ApiError } from "../utils/ApiError.js";
  *  - PATIENT   → always themselves
  *  - CAREGIVER → `?patientId=` of a patient who accepted their care invite
  *  - ADMIN     → any `?patientId=` (read access for moderation/support)
+ *  - DOCTOR / PHARMACY → no access to patient records
  */
 export async function patientScope(req: Request, _res: Response, next: NextFunction) {
   const user = req.user;
@@ -19,6 +20,9 @@ export async function patientScope(req: Request, _res: Response, next: NextFunct
     req.patientId = user.id;
     return next();
   }
+
+  // Doctors and pharmacies never browse patient records directly – they hand prescriptions over instead.
+  if (user.role !== "CAREGIVER" && user.role !== "ADMIN") throw ApiError.forbidden();
 
   if (!requested) throw ApiError.badRequest("patientId query parameter is required");
 
