@@ -17,6 +17,14 @@ enum Role {
   PATIENT
   CAREGIVER
   ADMIN
+  DOCTOR
+  PHARMACY
+}
+
+enum PrescriptionSource {
+  UPLOAD
+  DOCTOR
+  PHARMACY
 }
 
 enum UserStatus {
@@ -126,6 +134,17 @@ model User {
   chronicConditions String[]  @default([])
   emergencyContact  String?
 
+  // Offline alerts for feature-phone users (SMS / automated voice call)
+  smsEnabled  Boolean @default(false)
+  callEnabled Boolean @default(false)
+
+  // Doctor / pharmacy profile
+  organization  String? // hospital, chamber or pharmacy name
+  licenseNumber String? // BMDC registration or drug licence
+  specialty     String?
+  address       String?
+  isProVerified Boolean @default(false) // verified by an admin
+
   // Subscription
   plan          Plan      @default(FREE)
   planExpiresAt DateTime?
@@ -142,21 +161,23 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions          Session[]
-  otps              OtpToken[]
-  prescriptions     Prescription[]
-  medicines         Medicine[]
-  reminders         Reminder[]
-  doseLogs          DoseLog[]
-  inventory         InventoryItem[]
-  notifications     Notification[]
-  pushSubscriptions PushSubscription[]
-  aiInteractions    AiInteraction[]
-  chatMessages      ChatMessage[]
-  payments          Payment[]
-  patientLinks      CareLink[]         @relation("PatientLinks")
-  caregiverLinks    CareLink[]         @relation("CaregiverLinks")
-  auditLogs         AuditLog[]
+  sessions             Session[]
+  otps                 OtpToken[]
+  prescriptions        Prescription[]
+  medicines            Medicine[]
+  reminders            Reminder[]
+  doseLogs             DoseLog[]
+  inventory            InventoryItem[]
+  notifications        Notification[]
+  pushSubscriptions    PushSubscription[]
+  aiInteractions       AiInteraction[]
+  chatMessages         ChatMessage[]
+  payments             Payment[]
+  patientLinks         CareLink[]           @relation("PatientLinks")
+  caregiverLinks       CareLink[]           @relation("CaregiverLinks")
+  auditLogs            AuditLog[]
+  issuedPrescriptions  IssuedPrescription[] @relation("IssuedBy")
+  claimedPrescriptions IssuedPrescription[] @relation("ClaimedBy")
 
   @@index([role])
   @@index([status])
@@ -217,7 +238,8 @@ model CareLink {
 model Prescription {
   id             String             @id @default(cuid())
   patientId      String
-  imageUrl       String
+  imageUrl       String?
+  source         PrescriptionSource @default(UPLOAD)
   imagePublicId  String?
   title          String?
   doctorName     String?
@@ -432,4 +454,35 @@ model AuditLog {
   actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([createdAt])
+}
+
+// ───────────────────────────── Doctor / pharmacy hand-off ─────────────────────────────
+
+/// A prescription written by a doctor (or read by a pharmacy) that a patient claims
+/// by scanning its QR code or entering its code.
+model IssuedPrescription {
+  id             String             @id @default(cuid())
+  code           String             @unique // random, unguessable, printed as QR
+  issuerId       String
+  source         PrescriptionSource // DOCTOR or PHARMACY
+  patientName    String
+  patientAge     Int?
+  patientGender  String?
+  patientPhone   String?
+  diagnosis      String?
+  advice         String?
+  followUpDate   DateTime?
+  imageUrl       String? // pharmacy scan photo
+  imagePublicId  String?
+  items          Json // [{ name, strength, form, dosagePattern, mealTiming, durationDays, instructions, instructionsBn, reminders[] }]
+  claimedById    String?
+  claimedAt      DateTime?
+  prescriptionId String?            @unique
+  expiresAt      DateTime
+  createdAt      DateTime           @default(now())
+
+  issuer    User  @relation("IssuedBy", fields: [issuerId], references: [id], onDelete: Cascade)
+  claimedBy User? @relation("ClaimedBy", fields: [claimedById], references: [id], onDelete: SetNull)
+
+  @@index([issuerId, createdAt])
 }
