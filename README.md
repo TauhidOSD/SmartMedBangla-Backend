@@ -135,6 +135,8 @@ SMS / voice calls default to `SMS_PROVIDER=log` / `VOICE_PROVIDER=log` (messages
 
 ## Deployment
 
+### Option A — API on Render, frontend on Vercel
+
 **Database:** create a Postgres database (Neon / Supabase / Render) and copy its URL.
 
 **API (Render):** New → *Blueprint* → pick this repo (uses [render.yaml](render.yaml)), or a *Web Service* with the repo root →
@@ -146,6 +148,21 @@ SMS / voice calls default to `SMS_PROVIDER=log` / `VOICE_PROVIDER=log` (messages
 **Frontend (Vercel):** import the `frontend` repo → env `BACKEND_URL=https://<your-api>` → deploy.
 
 After both are live: set `CLIENT_URL` on Render to the Vercel URL (it is used for CORS, email links and the QR prescription links), redeploy the API, then open `<vercel-url>/api/health` to check the connection.
+
+### Option B — everything on Vercel
+
+The backend repo includes `vercel.json` + `api/index.js`, so the API runs as a Vercel serverless function.
+Serverless functions do not stay running, so reminder jobs are triggered from outside:
+
+1. Vercel → *Add New Project* → import `smartmed-backend` → Framework preset **Other** (build settings come from `vercel.json`).
+2. Environment variables: everything from `.env.example`, plus `NODE_ENV=production`, `COOKIE_SECURE=true`, `ENABLE_JOBS=false`,
+   `CRON_SECRET=<random 32+ chars>`, `CLIENT_URL=https://<frontend>.vercel.app`, `API_PUBLIC_URL=https://<backend>.vercel.app`. Deploy.
+3. Import `smartmed-frontend` as a second project → env `BACKEND_URL=https://<backend>.vercel.app` → deploy.
+4. [cron-job.org](https://cron-job.org) (free) → new job → URL `https://<backend>.vercel.app/api/jobs/tick`, every minute,
+   header `Authorization: Bearer <CRON_SECRET>`. This sends dose reminders, missed-dose and expiry alerts.
+5. Run `npx prisma migrate deploy` and `npm run db:seed` once from your computer with the production `DATABASE_URL`.
+
+Limits: Vercel request bodies max 4.5 MB (photos are compressed in the browser first); the free plan's own Vercel Cron runs once a day, which is used only for daily maintenance.
 
 **Redis (optional, recommended):** Upstash → set `REDIS_URL` on the API for BullMQ.
 **Web Push:** `npx web-push generate-vapid-keys` → `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`.
