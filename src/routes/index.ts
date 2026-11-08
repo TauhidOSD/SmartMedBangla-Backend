@@ -10,6 +10,7 @@ import authRoutes from "./auth.routes.js";
 import careRoutes from "./care.routes.js";
 import doseRoutes from "./dose.routes.js";
 import inventoryRoutes from "./inventory.routes.js";
+import { claimRoutes, issuedRoutes } from "./issued.routes.js";
 import medicineRoutes from "./medicine.routes.js";
 import notificationRoutes from "./notification.routes.js";
 import paymentRoutes from "./payment.routes.js";
@@ -36,6 +37,8 @@ router.get("/health", async (_req, res) => {
       email: features.smtp,
       webPush: features.webPush,
       payments: features.sslcommerz,
+      sms: features.sms,
+      voiceCall: features.voice,
     },
     uptime: Math.round(process.uptime()),
   });
@@ -52,6 +55,8 @@ router.use("/notifications", notificationRoutes);
 router.use("/ai", aiRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/admin", adminRoutes);
+router.use("/issued", issuedRoutes);
+router.use("/claim", claimRoutes);
 
 // Public, read-only doctor view
 router.get("/share/:token", userController.sharedProfile);

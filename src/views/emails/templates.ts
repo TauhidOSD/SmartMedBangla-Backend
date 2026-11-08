@@ -93,6 +93,19 @@ export const emailTemplates = {
     };
   },
 
+  issuedPrescription(patientName: string, issuerName: string, link: string) {
+    return {
+      subject: `${issuerName} sent you a prescription on SmartMed`,
+      html: layout(
+        "Your prescription is ready",
+        `<p>Hi ${escape(patientName)},</p>
+         <p><strong>${escape(issuerName)}</strong> sent you a digital prescription. Add it to SmartMed to get medicine reminders in Bangla.</p>
+         <p>${button(link, "Add to my SmartMed")}</p>
+         <p style="color:#64748b">You will be asked to log in or create a free account first.</p>`,
+      ),
+    };
+  },
+
   paymentSuccess(name: string, amount: string, until: string) {
     return {
       subject: "🎉 SmartMed Premium activated",

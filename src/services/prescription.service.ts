@@ -20,7 +20,7 @@ const SLOT_TIMES: Record<number, string[]> = {
   4: ["08:00", "13:00", "18:00", "22:00"],
 };
 
-function remindersFor(med: ExtractedMedicine) {
+export function remindersFor(med: ExtractedMedicine) {
   if (med.times.length) return med.times.map((time) => ({ time, quantity: med.quantity ?? "1" }));
   const parts = (med.dosagePattern ?? "").split(/[+\-]/).map((p) => p.trim());
   const slots = SLOT_TIMES[parts.length];
@@ -128,6 +128,7 @@ export const prescriptionService = {
   async reprocess(user: AuthUser, patientId: string, id: string) {
     const prescription = await getOwned(patientId, id);
     if (prescription.status === "VERIFIED") throw ApiError.badRequest("A verified prescription cannot be re-processed");
+    if (!prescription.imageUrl) throw ApiError.badRequest("This prescription has no photo to read");
     await aiService.assertScanQuota(user);
 
     const res = await fetch(prescription.imageUrl);
