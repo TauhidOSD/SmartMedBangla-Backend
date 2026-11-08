@@ -10,30 +10,30 @@ SM-8,Neon PostgreSQL connection + core models + first migration,Alamin,backend,M
 SM-9,"Design system: colours, typography, shadcn components, light/dark",Yousuf,frontend,MVP 01 — Foundation,Done,Task
 SM-10,"Responsive homepage (BN/EN toggle, default Bangla)",Yousuf,frontend,MVP 01 — Foundation,Done,Task
 SM-11,Features page + Pricing page + navigation,Yousuf,frontend,MVP 01 — Foundation,Done,Task
-SM-12,AI provider research: Gemini vision + Groq fallback spike,Jonathon,ai,MVP 01 — Foundation,Done,Task
+SM-12,AI provider research: Gemini vision + Groq fallback spike,Jonathan,ai,MVP 01 — Foundation,Done,Task
 SM-13,Initial deployment: Vercel (frontend) + Render (API),Ibrahim,devops,MVP 01 — Foundation,Done,Task
 SM-14,Registration + login + JWT access/refresh cookies,Touhid,backend,MVP 02 — Core development,Done,Task
 SM-15,Email OTP verification + OTP password reset,Touhid,backend,MVP 02 — Core development,Done,Task
 SM-16,"Account lockout, rate limiting, session/device management",Touhid,backend,MVP 02 — Core development,Done,Task
 SM-17,Protected routes (proxy.ts) + role authorization,Ibrahim,frontend,MVP 02 — Core development,Done,Task
-SM-18,Prescription upload → Cloudinary → AI OCR draft,Jonathon,ai,MVP 02 — Core development,Done,Task
+SM-18,Prescription upload → Cloudinary → AI OCR draft,Jonathan,ai,MVP 02 — Core development,Done,Task
 SM-19,Prescription review & confirm screen,Yousuf,frontend,MVP 02 — Core development,Done,Task
 SM-20,"Medicines CRUD + flexible reminders (1+0+1, days, quantity)",Alamin,backend,MVP 02 — Core development,Done,Task
 SM-21,Daily dose schedule: taken / skip / undo,Alamin,backend,MVP 02 — Core development,Done,Task
 SM-22,Today screen + dose history UI,Yousuf,frontend,MVP 02 — Core development,Done,Task
 SM-23,Caregiver invitations + caregiver dashboard,Ibrahim,backend,MVP 02 — Core development,Done,Task
 SM-24,Loading / empty / error states on every list,Yousuf,frontend,MVP 02 — Core development,Done,Task
-SM-25,AI medicine explainer + interaction checker,Jonathon,ai,MVP 02 — Core development,Done,Task
+SM-25,AI medicine explainer + interaction checker,Jonathan,ai,MVP 02 — Core development,Done,Task
 SM-26,Deploy latest stable build + update ERD,Ibrahim,devops,MVP 02 — Core development,Done,Task
 SM-27,Bangla voice reminders + web push + notification centre,Ibrahim,frontend,MVP 03 — Production release,Done,Task
 SM-28,"Background jobs: reminders, missed-dose & expiry alerts",Alamin,backend,MVP 03 — Production release,Done,Task
-SM-29,Medicine cabinet + AI expiry scanner,Jonathon,ai,MVP 03 — Production release,Done,Task
-SM-30,AI health assistant chat (voice input) + adherence coach,Jonathon,ai,MVP 03 — Production release,Done,Task
+SM-29,Medicine cabinet + AI expiry scanner,Jonathan,ai,MVP 03 — Production release,Done,Task
+SM-30,AI health assistant chat (voice input) + adherence coach,Jonathan,ai,MVP 03 — Production release,Done,Task
 SM-31,Adherence analytics charts,Yousuf,frontend,MVP 03 — Production release,Done,Task
 SM-32,Premium plan with SSLCommerz + free AI quota,Ibrahim,backend,MVP 03 — Production release,Done,Task
 SM-33,"Admin dashboard: stats, users, moderation, payments, AI logs, audit",Touhid,frontend,MVP 03 — Production release,Done,Task
 SM-34,Doctor QR prescriptions + patient claim flow,Ibrahim,backend,MVP 03 — Production release,Done,Task
-SM-35,Pharmacy dashboard + AI scan for customers + admin licence verification,Jonathon,ai,MVP 03 — Production release,Done,Task
+SM-35,Pharmacy dashboard + AI scan for customers + admin licence verification,Jonathan,ai,MVP 03 — Production release,Done,Task
 SM-36,SMS / voice-call alerts (BulkSMSBD / Twilio),Alamin,backend,MVP 03 — Production release,Done,Task
 SM-37,"Security pass: dependency audit, patient-scope rules, headers",Touhid,devops,MVP 03 — Production release,Done,Task
 SM-38,"Functional, responsive, API & auth testing (TESTING.md)",Yousuf,docs,MVP 03 — Production release,Done,Task

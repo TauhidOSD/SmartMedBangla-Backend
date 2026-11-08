@@ -11,7 +11,7 @@ For GitHub Projects, create the cards from this list (or run the `gh` script at 
 | --- | --- |
 | Touhid | Team lead — architecture, auth/security, deployment, reviews |
 | Alamin | Backend — data model, medicines, reminders, jobs |
-| Jonathon | AI — Gemini/Groq, OCR, assistant, scanners |
+| Jonathan | AI — Gemini/Groq, OCR, assistant, scanners |
 | Yousuf | Frontend — design system, pages, UX, testing |
 | Ibrahim | Full-stack — caregiver, admin, payments, QR & alerts |
 
@@ -30,7 +30,7 @@ For GitHub Projects, create the cards from this list (or run the `gh` script at 
 | SM-9 | Design system: colours, typography, shadcn components, light/dark | Yousuf | frontend |
 | SM-10 | Responsive homepage (BN/EN toggle, default Bangla) | Yousuf | frontend |
 | SM-11 | Features page + Pricing page + navigation | Yousuf | frontend |
-| SM-12 | AI provider research: Gemini vision + Groq fallback spike | Jonathon | ai |
+| SM-12 | AI provider research: Gemini vision + Groq fallback spike | Jonathan | ai |
 | SM-13 | Initial deployment: Vercel (frontend) + Render (API) | Ibrahim | devops |
 
 ## MVP 02 — Core development (Week 2)
@@ -41,14 +41,14 @@ For GitHub Projects, create the cards from this list (or run the `gh` script at 
 | SM-15 | Email OTP verification + OTP password reset | Touhid | backend |
 | SM-16 | Account lockout, rate limiting, session/device management | Touhid | backend |
 | SM-17 | Protected routes (proxy.ts) + role authorization | Ibrahim | frontend |
-| SM-18 | Prescription upload → Cloudinary → AI OCR draft | Jonathon | ai |
+| SM-18 | Prescription upload → Cloudinary → AI OCR draft | Jonathan | ai |
 | SM-19 | Prescription review & confirm screen | Yousuf | frontend |
 | SM-20 | Medicines CRUD + flexible reminders (1+0+1, days, quantity) | Alamin | backend |
 | SM-21 | Daily dose schedule: taken / skip / undo | Alamin | backend |
 | SM-22 | Today screen + dose history UI | Yousuf | frontend |
 | SM-23 | Caregiver invitations + caregiver dashboard | Ibrahim | backend |
 | SM-24 | Loading / empty / error states on every list | Yousuf | frontend |
-| SM-25 | AI medicine explainer + interaction checker | Jonathon | ai |
+| SM-25 | AI medicine explainer + interaction checker | Jonathan | ai |
 | SM-26 | Deploy latest stable build + update ERD | Ibrahim | devops |
 
 ## MVP 03 — Production release (Week 3)
@@ -57,13 +57,13 @@ For GitHub Projects, create the cards from this list (or run the `gh` script at 
 | --- | --- | --- | --- |
 | SM-27 | Bangla voice reminders + web push + notification centre | Ibrahim | frontend |
 | SM-28 | Background jobs: reminders, missed-dose & expiry alerts | Alamin | backend |
-| SM-29 | Medicine cabinet + AI expiry scanner | Jonathon | ai |
-| SM-30 | AI health assistant chat (voice input) + adherence coach | Jonathon | ai |
+| SM-29 | Medicine cabinet + AI expiry scanner | Jonathan | ai |
+| SM-30 | AI health assistant chat (voice input) + adherence coach | Jonathan | ai |
 | SM-31 | Adherence analytics charts | Yousuf | frontend |
 | SM-32 | Premium plan with SSLCommerz + free AI quota | Ibrahim | backend |
 | SM-33 | Admin dashboard: stats, users, moderation, payments, AI logs, audit | Touhid | frontend |
 | SM-34 | Doctor QR prescriptions + patient claim flow | Ibrahim | backend |
-| SM-35 | Pharmacy dashboard + AI scan for customers + admin licence verification | Jonathon | ai |
+| SM-35 | Pharmacy dashboard + AI scan for customers + admin licence verification | Jonathan | ai |
 | SM-36 | SMS / voice-call alerts (BulkSMSBD / Twilio) | Alamin | backend |
 | SM-37 | Security pass: dependency audit, patient-scope rules, headers | Touhid | devops |
 | SM-38 | Functional, responsive, API & auth testing (TESTING.md) | Yousuf | docs |

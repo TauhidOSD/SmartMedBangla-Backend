@@ -165,7 +165,7 @@ After both are live: set `CLIENT_URL` on Render to the Vercel URL (it is used fo
 | --- | --- | --- |
 | Touhid | Team lead | Architecture, auth & security, deployment, reviews |
 | Alamin | Backend | Prescriptions, medicines, reminders, jobs |
-| Jonathon | AI | Gemini/Groq integration, OCR, assistant, insights |
+| Jonathan | AI | Gemini/Groq integration, OCR, assistant, insights |
 | Yousuf | Frontend | Design system, landing page, dashboard UI, i18n |
 | Ibrahim | Full-stack | Caregiver, admin dashboard, payments, QR & SMS alerts |
 
