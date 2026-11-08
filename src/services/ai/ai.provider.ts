@@ -23,7 +23,14 @@ export interface GenerateResult {
   provider: string;
 }
 
-const TIMEOUT_MS = 60_000;
+/**
+ * Per-provider limit. Two providers must fit inside the host's request limit (60 s on Vercel),
+ * so a hanging primary model still leaves time for the fallback to answer.
+ */
+const TIMEOUT_MS = 25_000;
+/** After a provider fails, skip it for a while so users don't wait for it on every request. */
+const COOLDOWN_MS = 2 * 60_000;
+const cooldownUntil = new Map<string, number>();
 
 let gemini: GoogleGenAI | null = null;
 const getGemini = () => (gemini ??= new GoogleGenAI({ apiKey: env.GEMINI_API_KEY! }));
@@ -99,12 +106,19 @@ export async function generate(opts: GenerateOptions): Promise<GenerateResult> {
     throw ApiError.unavailable("AI features are not configured on the server.", "AI_DISABLED");
   }
 
+  // Providers in cooldown go last instead of being dropped, so a single configured provider still gets tried.
+  const now = Date.now();
+  providers.sort((a, b) => Number((cooldownUntil.get(a.name) ?? 0) > now) - Number((cooldownUntil.get(b.name) ?? 0) > now));
+
   let lastError: unknown;
   for (const provider of providers) {
     try {
-      return await provider.run(opts);
+      const result = await provider.run(opts);
+      cooldownUntil.delete(provider.name);
+      return result;
     } catch (err) {
       lastError = err;
+      cooldownUntil.set(provider.name, Date.now() + COOLDOWN_MS);
       logger.warn(`AI provider ${provider.name} failed:`, (err as Error).message);
     }
   }

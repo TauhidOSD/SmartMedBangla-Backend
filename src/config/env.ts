@@ -29,7 +29,7 @@ const envSchema = z.object({
   COOKIE_SAME_SITE: z.enum(["lax", "strict", "none"]).default("lax"),
 
   GEMINI_API_KEY: optional,
-  GEMINI_MODEL: z.string().default("gemini-3.8-flash"),
+  GEMINI_MODEL: z.string().default("gemini-3.5-flash"),
   GROQ_API_KEY: optional,
   GROQ_MODEL: z.string().default("openai/gpt-oss-120b"),
   GROQ_VISION_MODEL: optional,
