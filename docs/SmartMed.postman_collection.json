@@ -1,0 +1,1635 @@
+{
+  "info": {
+    "name": "SmartMed API",
+    "description": "Generated from docs/API.md. Run \"POST /auth/login\" first; the access token is stored and sent as a Bearer token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "lang",
+      "value": "en"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('response is JSON envelope', () => pm.expect(pm.response.json()).to.have.property('success'));"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/health",
+            "description": "Database status + which integrations are configured"
+          }
+        },
+        {
+          "name": "GET /stats/public",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/stats/public",
+            "description": "Real platform counts for the landing page (cached 5 min)"
+          }
+        },
+        {
+          "name": "GET /share/:token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/share/{{token}}",
+            "description": "Read-only medical summary shared with a doctor"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /auth/register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "description": "PHARMACY, organization?, licenseNumber?, specialty? }` — organization + licence required for DOCTOR/PHARMACY → sends OTP, logs in"
+          }
+        },
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "`{ email, password }` (5 failures → 15 min lock)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = pm.response.json().data || {};",
+                  "if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
+                  "pm.test('status is 2xx', () => pm.expect(pm.response.code).to.be.within(200, 299));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/refresh",
+            "description": "cookie or `{ refreshToken }` — rotates refresh token",
+            "body": {
+              "mode": "raw",
+              "raw": "{ refreshToken }"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "description": "revokes the current session"
+          }
+        },
+        {
+          "name": "POST /auth/verify-email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/verify-email",
+            "description": "`{ email, code }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ email, code }"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/resend-otp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/resend-otp",
+            "description": "PASSWORD_RESET }` (60 s cooldown)"
+          }
+        },
+        {
+          "name": "POST /auth/forgot-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/forgot-password",
+            "description": "`{ email }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ email }"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/reset-password",
+            "description": "`{ email, code, password }` — logs out all devices",
+            "body": {
+              "mode": "raw",
+              "raw": "{ email, code, password }"
+            }
+          }
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/me",
+            "description": "Current user"
+          }
+        },
+        {
+          "name": "PATCH /auth/change-password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/change-password",
+            "description": "`{ currentPassword, newPassword }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ currentPassword, newPassword }"
+            }
+          }
+        },
+        {
+          "name": "GET /auth/sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/sessions",
+            "description": "Active devices"
+          }
+        },
+        {
+          "name": "DELETE /auth/sessions",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/sessions",
+            "description": "Log out all other devices"
+          }
+        },
+        {
+          "name": "DELETE /auth/sessions/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/sessions/{{id}}",
+            "description": "Revoke one device"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /users/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me",
+            "description": "Profile"
+          }
+        },
+        {
+          "name": "PATCH /users/me",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me",
+            "description": "`{ name?, phone?, dateOfBirth?, gender?, bloodGroup?, allergies?, chronicConditions?, emergencyContact?, organization?, licenseNumber?, specialty?, address? }` — changing the licence number clears `isProVerified`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ name?, phone?, dateOfBirth?, gender?, bloodGroup?, allergies?, chronicConditions?, emergencyContact?, organization?, licenseNumber?, specialty?, address? }"
+            }
+          }
+        },
+        {
+          "name": "PATCH /users/me/preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/preferences",
+            "description": "`{ language?, largeFont?, voiceEnabled?, timezone?, honorific?, smsEnabled?, callEnabled? }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ language?, largeFont?, voiceEnabled?, timezone?, honorific?, smsEnabled?, callEnabled? }"
+            }
+          }
+        },
+        {
+          "name": "POST /users/me/test-alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/test-alert",
+            "description": "Sends a test SMS (and a call if enabled) to the saved phone"
+          }
+        },
+        {
+          "name": "POST /users/me/avatar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/avatar",
+            "description": "multipart `image`"
+          }
+        },
+        {
+          "name": "POST /users/me/share-link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/share-link",
+            "description": "null }`"
+          }
+        },
+        {
+          "name": "DELETE /users/me/share-link",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/share-link",
+            "description": "Disable doctor link"
+          }
+        },
+        {
+          "name": "DELETE /users/me",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me",
+            "description": "`{ password }` — delete account"
+          }
+        },
+        {
+          "name": "GET /users/dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/dashboard",
+            "description": "Today's doses, 7-day adherence, counts, expiring items"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prescriptions",
+      "item": [
+        {
+          "name": "GET /prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/prescriptions",
+            "description": "`?page&limit&search&status` — history, newest first"
+          }
+        },
+        {
+          "name": "POST /prescriptions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/prescriptions",
+            "description": "✉️ multipart `image`, `title?` — upload → Cloudinary → **AI OCR**; returns draft medicines"
+          }
+        },
+        {
+          "name": "GET /prescriptions/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/prescriptions/{{id}}",
+            "description": "Detail with medicines + reminders"
+          }
+        },
+        {
+          "name": "PATCH /prescriptions/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/prescriptions/{{id}}",
+            "description": "Update doctor / hospital / date / diagnosis / advice / notes"
+          }
+        },
+        {
+          "name": "POST /prescriptions/:id/confirm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/prescriptions/{{id}}/confirm",
+            "description": "`{ ...metadata, medicines: [{ name, strength?, mealTiming, durationDays?, reminders: [{ time, quantity, daysOfWeek }] }] }` — verifies and starts reminders",
+            "body": {
+              "mode": "raw",
+              "raw": "{ ...metadata, medicines: [{ name, strength?, mealTiming, durationDays?, reminders: [{ time, quantity, daysOfWeek }] }] }"
+            }
+          }
+        },
+        {
+          "name": "POST /prescriptions/:id/reprocess",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/prescriptions/{{id}}/reprocess",
+            "description": "✉️ Re-run AI on the stored image"
+          }
+        },
+        {
+          "name": "DELETE /prescriptions/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/prescriptions/{{id}}",
+            "description": "Delete (drafts removed, confirmed medicines kept)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medicines",
+      "item": [
+        {
+          "name": "GET /medicines",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/medicines",
+            "description": "`?active=true&search=`"
+          }
+        },
+        {
+          "name": "POST /medicines",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/medicines",
+            "description": "`{ name, genericName?, strength?, form?, dosagePattern?, instructions?, instructionsBn?, mealTiming, durationDays?, startDate?, endDate?, reminders: [...] }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ name, genericName?, strength?, form?, dosagePattern?, instructions?, instructionsBn?, mealTiming, durationDays?, startDate?, endDate?, reminders: [...] }"
+            }
+          }
+        },
+        {
+          "name": "GET /medicines/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/medicines/{{id}}",
+            "description": "Detail"
+          }
+        },
+        {
+          "name": "PATCH /medicines/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/medicines/{{id}}",
+            "description": "Partial update; `reminders` array is synced (history-preserving); `isActive` pauses/resumes"
+          }
+        },
+        {
+          "name": "DELETE /medicines/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/medicines/{{id}}",
+            "description": "Delete with history"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doses",
+      "item": [
+        {
+          "name": "GET /doses/today",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/doses/today",
+            "description": "Today's doses in the patient's timezone + summary + next dose"
+          }
+        },
+        {
+          "name": "GET /doses/history",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/doses/history",
+            "description": "`?from&to` (max 3 months)"
+          }
+        },
+        {
+          "name": "GET /doses/stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/doses/stats",
+            "description": "`?days=30` — adherence %, streak, daily series, by medicine, by time of day"
+          }
+        },
+        {
+          "name": "PATCH /doses/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/doses/{{id}}",
+            "description": "PENDING }` (within −48 h … +2 h)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medicine",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/",
+            "description": "disposed` + summary"
+          }
+        },
+        {
+          "name": "POST /scan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/scan",
+            "description": "✉️ multipart `image` — **AI reads name, batch, expiry** (returns uploaded image URL)"
+          }
+        },
+        {
+          "name": "POST /",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/",
+            "description": "`{ name, expiryDate, manufactureDate?, batchNumber?, quantity?, imageUrl?, imagePublicId?, notes? }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ name, expiryDate, manufactureDate?, batchNumber?, quantity?, imageUrl?, imagePublicId?, notes? }"
+            }
+          }
+        },
+        {
+          "name": "PATCH /:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/{{id}}",
+            "description": "Partial update, `isDisposed`"
+          }
+        },
+        {
+          "name": "DELETE /:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/{{id}}",
+            "description": "Remove"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Care",
+      "item": [
+        {
+          "name": "GET /caregivers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/caregivers",
+            "description": "My caregivers (pending + active)"
+          }
+        },
+        {
+          "name": "POST /caregivers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/caregivers",
+            "description": "`{ email, relation? }` — invite (Free: 2, Premium: 10)",
+            "body": {
+              "mode": "raw",
+              "raw": "{ email, relation? }"
+            }
+          }
+        },
+        {
+          "name": "DELETE /caregivers/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/caregivers/{{id}}",
+            "description": "Revoke access"
+          }
+        },
+        {
+          "name": "GET /invites",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/invites",
+            "description": "Pending invitations for my email"
+          }
+        },
+        {
+          "name": "POST /invites/:id/respond",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/invites/{{id}}/respond",
+            "description": "`{ accept: boolean }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ accept: boolean }"
+            }
+          }
+        },
+        {
+          "name": "GET /patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/patients",
+            "description": "My patients with today's progress & missed doses"
+          }
+        },
+        {
+          "name": "GET /patients/:patientId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/patients/{{patientId}}",
+            "description": "Full overview: profile, today, 7-day stats, medicines, expiring items"
+          }
+        },
+        {
+          "name": "PATCH /patients/:patientId/alerts",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/patients/{{patientId}}/alerts",
+            "description": "`{ phone?, smsEnabled?, callEnabled? }` — set up SMS / call alerts for an elder",
+            "body": {
+              "mode": "raw",
+              "raw": "{ phone?, smsEnabled?, callEnabled? }"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Issued",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/",
+            "description": "`?page&limit&search` — issued list + stats"
+          }
+        },
+        {
+          "name": "POST /",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/",
+            "description": "✉️ `{ patientName, patientAge?, patientGender?, patientPhone?, diagnosis?, advice?, followUpDate?, items: [{ name, strength?, dosageForm?, instructions?, mealTiming, durationDays?, reminders }] }` → `{ code, claimUrl, expiresAt }` (90 days)",
+            "body": {
+              "mode": "raw",
+              "raw": "{ patientName, patientAge?, patientGender?, patientPhone?, diagnosis?, advice?, followUpDate?, items: [{ name, strength?, dosageForm?, instructions?, mealTiming, durationDays?, reminders }] }"
+            }
+          }
+        },
+        {
+          "name": "POST /scan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/scan",
+            "description": "PHARMACY ✉️ multipart `image` — 🤖 reads a paper prescription into editable items"
+          }
+        },
+        {
+          "name": "GET /:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/{{id}}",
+            "description": "One issued prescription"
+          }
+        },
+        {
+          "name": "DELETE /:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/{{id}}",
+            "description": "Only while unclaimed"
+          }
+        },
+        {
+          "name": "POST /:id/send",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/{{id}}/send",
+            "description": "`{ email }` — existing patient account: added directly + notified; otherwise the QR link is emailed",
+            "body": {
+              "mode": "raw",
+              "raw": "{ email }"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Claim",
+      "item": [
+        {
+          "name": "GET /:code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/{{code}}",
+            "description": "Preview: issuer (verified or not), patient name, diagnosis, medicines"
+          }
+        },
+        {
+          "name": "POST /:code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/{{code}}",
+            "description": "Adds it to the account with medicines + reminders (doctor → VERIFIED, pharmacy → needs review). Same patient again → 200; another account → 409"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "GET /notifications/push/config",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/push/config",
+            "description": "VAPID public key"
+          }
+        },
+        {
+          "name": "GET /notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications",
+            "description": "`?page&limit&unread=true`"
+          }
+        },
+        {
+          "name": "GET /notifications/unread-count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/unread-count",
+            "description": "Badge count"
+          }
+        },
+        {
+          "name": "GET /notifications/speakable",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/speakable",
+            "description": "`?minutes=15` — recent unread items with a Bangla voice line"
+          }
+        },
+        {
+          "name": "PATCH /notifications/read-all",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/read-all",
+            "description": "Mark all read"
+          }
+        },
+        {
+          "name": "PATCH /notifications/:id/read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/{{id}}/read",
+            "description": "Mark one read"
+          }
+        },
+        {
+          "name": "DELETE /notifications/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/{{id}}",
+            "description": "Delete"
+          }
+        },
+        {
+          "name": "POST /notifications/push/subscribe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/push/subscribe",
+            "description": "Browser `PushSubscription` JSON"
+          }
+        },
+        {
+          "name": "DELETE /notifications/push/subscribe",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/push/subscribe",
+            "description": "`{ endpoint }`"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "GET /ai/usage",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/ai/usage",
+            "description": "Monthly scan quota usage"
+          }
+        },
+        {
+          "name": "POST /ai/medicine-info",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/ai/medicine-info",
+            "description": "✉️ `{ name, language? }` — explainer (cached)",
+            "body": {
+              "mode": "raw",
+              "raw": "{ name, language? }"
+            }
+          }
+        },
+        {
+          "name": "POST /ai/interactions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/ai/interactions",
+            "description": "✉️ 🧑‍⚕️ `{ medicines?: string[], language? }` — checks active medicines + extras vs allergies/conditions",
+            "body": {
+              "mode": "raw",
+              "raw": "{ medicines?: string[], language? }"
+            }
+          }
+        },
+        {
+          "name": "GET /ai/chat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/ai/chat",
+            "description": "Chat history"
+          }
+        },
+        {
+          "name": "POST /ai/chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/ai/chat",
+            "description": "✉️ `{ message, language? }` — assistant reply (context: current medicines)",
+            "body": {
+              "mode": "raw",
+              "raw": "{ message, language? }"
+            }
+          }
+        },
+        {
+          "name": "DELETE /ai/chat",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/ai/chat",
+            "description": "Clear conversation"
+          }
+        },
+        {
+          "name": "POST /ai/adherence-insight",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/ai/adherence-insight",
+            "description": "✉️ 🧑‍⚕️ `{ language? }` — AI analysis of last 30 days",
+            "body": {
+              "mode": "raw",
+              "raw": "{ language? }"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "GET /payments/plans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/plans",
+            "description": "Plans and prices (BDT)"
+          }
+        },
+        {
+          "name": "GET /payments/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/me",
+            "description": "My payment history"
+          }
+        },
+        {
+          "name": "POST /payments/init",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/init",
+            "description": "12 }` → `{ gatewayUrl, tranId }`",
+            "body": {
+              "mode": "raw",
+              "raw": "{ gatewayUrl, tranId }"
+            }
+          }
+        },
+        {
+          "name": "POST /payments/success/:tranId",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/success/{{tranId}}",
+            "description": "Validates `val_id` server-side, activates Premium, redirects to frontend"
+          }
+        },
+        {
+          "name": "POST /payments/ipn",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments/ipn",
+            "description": "Instant payment notification (idempotent)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "GET /admin/stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/stats",
+            "description": "Users, prescriptions, adherence, AI usage/latency, revenue, 30-day series"
+          }
+        },
+        {
+          "name": "GET /admin/users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users",
+            "description": "`?page&search&role&status`"
+          }
+        },
+        {
+          "name": "PATCH /admin/users/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{id}}",
+            "description": "`{ role?, status?, plan?, planExpiresAt? }` (suspension revokes sessions)",
+            "body": {
+              "mode": "raw",
+              "raw": "{ role?, status?, plan?, planExpiresAt? }"
+            }
+          }
+        },
+        {
+          "name": "DELETE /admin/users/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{id}}",
+            "description": "Delete user"
+          }
+        },
+        {
+          "name": "POST /admin/users/:id/force-logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{id}}/force-logout",
+            "description": "Revoke all sessions"
+          }
+        },
+        {
+          "name": "GET /admin/prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/prescriptions",
+            "description": "Moderation list `?page&search&status`"
+          }
+        },
+        {
+          "name": "DELETE /admin/prescriptions/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/prescriptions/{{id}}",
+            "description": "`{ reason? }` — remove upload (audited)"
+          }
+        },
+        {
+          "name": "GET /admin/payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/payments",
+            "description": "`?page&search&status`"
+          }
+        },
+        {
+          "name": "GET /admin/ai-logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/ai-logs",
+            "description": "failed`"
+          }
+        },
+        {
+          "name": "GET /admin/audit-logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/audit-logs",
+            "description": "Admin action trail"
+          }
+        },
+        {
+          "name": "POST /admin/broadcast",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-lang",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/broadcast",
+            "description": "`{ title, message, role? }` — system notification",
+            "body": {
+              "mode": "raw",
+              "raw": "{ title, message, role? }"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
