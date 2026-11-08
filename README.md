@@ -4,8 +4,8 @@
 
 | | Link |
 | --- | --- |
-| 🌐 Live app | _add the Vercel URL here_ |
-| ⚙️ API | _add the Render URL here_ (`/api/health`) |
+| 🌐 Live app | https://smartmed-frontend-nine.vercel.app |
+| ⚙️ API | https://smartmed-backend.vercel.app/api/health |
 | 📦 Backend repo (this repo — API + all project docs) | https://github.com/GeorgeBlaize/backend |
 | 🖥️ Frontend repo | https://github.com/GeorgeBlaize/frontend |
 | 📋 Project board | _add the GitHub Projects / Trello link here_ — backlog in [docs/PROJECT_BOARD.md](docs/PROJECT_BOARD.md) |
