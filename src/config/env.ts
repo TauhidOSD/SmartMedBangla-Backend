@@ -67,6 +67,8 @@ const envSchema = z.object({
   FREE_AI_SCANS_PER_MONTH: z.coerce.number().default(5),
   MISSED_DOSE_GRACE_MINUTES: z.coerce.number().default(30),
   ENABLE_JOBS: bool(true),
+  /** Shared secret for GET /api/jobs/tick (serverless hosting such as Vercel + an external cron). */
+  CRON_SECRET: optional.refine((v) => v === undefined || v.length >= 16, "CRON_SECRET must be at least 16 characters"),
 });
 
 const parsed = envSchema.safeParse(process.env);

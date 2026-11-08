@@ -15,6 +15,7 @@ import medicineRoutes from "./medicine.routes.js";
 import notificationRoutes from "./notification.routes.js";
 import paymentRoutes from "./payment.routes.js";
 import prescriptionRoutes from "./prescription.routes.js";
+import jobRoutes from "./jobs.routes.js";
 import userRoutes from "./user.routes.js";
 
 const router = Router();
@@ -57,6 +58,7 @@ router.use("/payments", paymentRoutes);
 router.use("/admin", adminRoutes);
 router.use("/issued", issuedRoutes);
 router.use("/claim", claimRoutes);
+router.use("/jobs", jobRoutes);
 
 // Public, read-only doctor view
 router.get("/share/:token", userController.sharedProfile);
