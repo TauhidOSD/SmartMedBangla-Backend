@@ -1,7 +1,7 @@
 # 💊 SmartMed
 
 **AI prescription reader, Bangla voice medicine reminders and a family care dashboard — in the browser, no app download.**
-
+//something
 | | Link |
 | --- | --- |
 | 🌐 Live app | https://smartmed-frontend-nine.vercel.app |
